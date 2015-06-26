@@ -34,6 +34,7 @@ var (
 	outputDir      = flag.String("output-dir", "/tmp", "directory to write output files to")
 	datetimeFormat = flag.String("datetime-format", "%Y-%m-%d_%H", "strftime compatible format for <DATETIME> in filename format")
 	filenameFormat = flag.String("filename-format", "<TOPIC>.<HOST><REV>.<DATETIME>.log", "output filename format (<TOPIC>, <HOST>, <PID>, <DATETIME>, <REV> are replaced. <REV> is increased when file already exists)")
+	filenameTimezone = flag.String("filenameTimezone", "", "Timezone to use when calculating dates for filename. Must be valid location (e.g. Americas/New_York, GMT). Defaults to host timezone.")
 	hostIdentifier = flag.String("host-identifier", "", "value to output in log filename in place of hostname. <SHORT_HOST> and <HOSTNAME> are valid replacement tokens")
 	gzipLevel      = flag.Int("gzip-level", 6, "gzip compression level (1-9, 1=BestSpeed, 9=BestCompression)")
 	gzipEnabled    = flag.Bool("gzip", false, "gzip output files.")
@@ -220,6 +221,10 @@ func (f *FileLogger) Sync() error {
 
 func (f *FileLogger) calculateCurrentFilename() string {
 	t := time.Now()
+    loc, err := time.LoadLocation(*filenameTimezone)
+    if err == nil {
+        t = t.In(loc)
+    }
 	datetime := strftime(*datetimeFormat, t)
 	return strings.Replace(f.filenameFormat, "<DATETIME>", datetime, -1)
 }
