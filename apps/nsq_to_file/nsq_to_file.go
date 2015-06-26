@@ -221,10 +221,10 @@ func (f *FileLogger) Sync() error {
 
 func (f *FileLogger) calculateCurrentFilename() string {
 	t := time.Now()
-    loc, err := time.LoadLocation(*filenameTimezone)
-    if err == nil {
-        t = t.In(loc)
-    }
+	loc, err := time.LoadLocation(*filenameTimezone)
+	if err == nil {
+		t = t.In(loc)
+	}
 	datetime := strftime(*datetimeFormat, t)
 	return strings.Replace(f.filenameFormat, "<DATETIME>", datetime, -1)
 }
